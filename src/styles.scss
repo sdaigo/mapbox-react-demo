@@ -1,0 +1,29 @@
+html,
+body {
+  margin: 0;
+}
+
+body {
+  font-family: sans-serif;
+}
+
+html,
+body,
+#root,
+.map-container {
+  height: 100%;
+}
+
+.map-container {
+  width: 100%;
+}
+
+select {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1;
+
+  padding: 8px;
+  min-width: 160px;
+}
