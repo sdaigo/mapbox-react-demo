@@ -1,37 +1,62 @@
 import * as React from "react";
-import Mapbox from "mapbox-gl";
+import ReactMapGL, {
+  Source,
+  Layer,
+  ViewportProps,
+  LayerProps,
+} from "react-map-gl";
+import * as GeoJSON from "geojson";
 
 interface Props {
   styleUrl: string;
 }
 
-Mapbox.accessToken =
-  "pk.eyJ1IjoiZGFpZ28zIiwiYSI6ImNrOHRpbnE5azAwb3czZW8za3d2aXkwYTcifQ.mgnG69sg5mZrpok19dLiWg";
+const INITIAL_VIEWPORT: ViewportProps = {
+  longitude: 139.6269549,
+  latitude: 35.4745755,
+  zoom: 16,
+};
+
+const geoJson: GeoJSON.FeatureCollection<GeoJSON.Geometry> = {
+  type: "FeatureCollection",
+  features: [
+    {
+      type: "Feature",
+      properties: {},
+      geometry: { type: "Point", coordinates: [139.6269549, 35.4745755] },
+    },
+  ],
+};
+
+const layerStyle: LayerProps = {
+  id: "point",
+  type: "circle",
+  paint: {
+    "circle-radius": 10,
+    "circle-color": "#007cbf",
+  },
+};
 
 const Map: React.FC<Props> = ({ styleUrl }) => {
-  const [map, setMap] = React.useState<Mapbox.Map | null>(null);
-  const mapContainer = React.useRef<HTMLDivElement>(null);
+  const [viewport, setViewport] = React.useState(INITIAL_VIEWPORT);
 
-  React.useEffect(() => {
-    map?.setStyle(styleUrl);
-  }, [map, styleUrl]);
+  const handleViewportChange = (viewport: ViewportProps) => {
+    setViewport(viewport);
+  };
 
-  React.useEffect(() => {
-    if (!mapContainer.current) {
-      return;
-    }
-
-    setMap(
-      new Mapbox.Map({
-        container: mapContainer.current,
-        style: styleUrl,
-        center: [139.6269549, 35.4745755],
-        zoom: 16,
-      })
-    );
-  }, []);
-
-  return <div className="map-container" ref={mapContainer} />;
+  return (
+    <ReactMapGL
+      {...viewport}
+      width="100vw"
+      height="100vh"
+      mapStyle={styleUrl}
+      onViewportChange={handleViewportChange}
+    >
+      <Source id="points" type="geojson" data={geoJson}>
+        <Layer {...layerStyle} />
+      </Source>
+    </ReactMapGL>
+  );
 };
 
 export default Map;
